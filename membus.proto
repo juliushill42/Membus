@@ -1,0 +1,52 @@
+syntax = "proto3";
+package membus.v1;
+option go_package = "membus/v1;membusv1";
+
+service MemoryService {
+  rpc PublishMemory (PublishRequest) returns (PublishResponse);
+  rpc QueryMemory   (QueryRequest)  returns (QueryResponse);
+  rpc VerifyMemory  (VerifyRequest) returns (VerifyResponse);
+}
+
+message PublishRequest {
+  string         agent_id  = 1;
+  string         channel   = 2;
+  string         content   = 3;
+  repeated float embedding = 4;
+}
+
+message PublishResponse {
+  string id               = 1;
+  bytes  zk_commitment    = 2;
+  bytes  random_blinding  = 3;
+  bool   success          = 4;
+}
+
+message QueryRequest {
+  string         channel         = 1;
+  repeated float query_embedding = 2;
+  int32          limit           = 3;
+}
+
+message MemoryEvent {
+  string id            = 1;
+  string agent_id      = 2;
+  string channel       = 3;
+  string content       = 4;
+  bytes  zk_commitment = 5;
+  float  score         = 6;
+}
+
+message QueryResponse {
+  repeated MemoryEvent memories = 1;
+}
+
+message VerifyRequest {
+  bytes  zk_commitment  = 1;
+  bytes  random_blinding = 2;
+  string content        = 3;
+}
+
+message VerifyResponse {
+  bool is_valid = 1;
+}

@@ -1,0 +1,30 @@
+services:
+  membus:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: membus:latest
+    container_name: membus
+    ports:
+      - "50051:50051"
+      - "8080:8080"
+    volumes:
+      - membus_data:/data
+    restart: unless-stopped
+    environment:
+      - DATA_DIR=/data
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+volumes:
+  membus_data:
+    driver: local
